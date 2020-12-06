@@ -1,0 +1,34 @@
+PODS:
+  - camera (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+  - media_gallery (0.0.1):
+    - Flutter
+  - scan_document (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - camera (from `.symlinks/plugins/camera/ios`)
+  - Flutter (from `Flutter`)
+  - media_gallery (from `.symlinks/plugins/media_gallery/ios`)
+  - scan_document (from `.symlinks/plugins/scan_document/ios`)
+
+EXTERNAL SOURCES:
+  camera:
+    :path: ".symlinks/plugins/camera/ios"
+  Flutter:
+    :path: Flutter
+  media_gallery:
+    :path: ".symlinks/plugins/media_gallery/ios"
+  scan_document:
+    :path: ".symlinks/plugins/scan_document/ios"
+
+SPEC CHECKSUMS:
+  camera: a0ca5080336f7af47b88436e5e26da3dee5568f0
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  media_gallery: 834a04455a476b975c280aa1f24ed2853dfe36de
+  scan_document: 289f6d591aba799c49c2235bed1fe350f7a9e743
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.10.0
