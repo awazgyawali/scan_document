@@ -11,6 +11,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  camera: ^0.5.8+17
+  image: ^2.1.19
+  media_gallery: ^0.1.5
+  path_provider: ^1.6.24
 
 dev_dependencies:
   flutter_test:
