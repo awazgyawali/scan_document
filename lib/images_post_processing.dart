@@ -1,6 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:image/image.dart' as i;
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:scan_document/image_cropper.dart';
 
 class ImagesPostProcessing extends StatefulWidget {
@@ -12,35 +17,73 @@ class ImagesPostProcessing extends StatefulWidget {
 }
 
 class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
-  File selectedFile;
-  Map<File, List<Offset>> allPoints = {};
-  @override
-  void initState() {
-    super.initState();
-    selectedFile = widget.images[0];
-  }
+  int index = 0;
+  Map<File, List<Offset>> points = {};
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      appBar: AppBar(
+        title: Text("Scan Document"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.check),
+            onPressed: () async {
+              List<i.Image> images = [];
+              widget.images.forEach(
+                (file) {
+                  i.Image image = i.decodeImage(file.readAsBytesSync());
+                  if (image.exif.hasOrientation &&
+                      image.exif.orientation != 1) {
+                    switch (image.exif.orientation) {
+                      case 6:
+                        image = i.copyRotate(image, 90);
+                        break;
+                    }
+                    image.exif.orientation = 1;
+                  }
+                  List<Offset> dots = points[file];
+                  images.add(
+                    i.copyCrop(
+                      image,
+                      (dots[0].dx * image.width).round(),
+                      (dots[0].dy * image.height).round(),
+                      ((dots[1].dx - dots[0].dx) * image.width).round(),
+                      ((dots[1].dy - dots[0].dy) * image.height).round(),
+                    ),
+                  );
+                },
+              );
+              File pdf = await _exportPDFFile(images);
+              Navigator.pop(context, pdf);
+            },
+          )
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
-            child: ImageCropper(
-              image: selectedFile,
-              points: allPoints[selectedFile] ??
-                  [
-                    Offset(0, 0),
-                    Offset(0, 100),
-                    Offset(100, 100),
-                    Offset(100, 0),
-                  ],
-              onPointsChanged: (points) {
-                setState(() {
-                  allPoints[selectedFile] = points;
-                });
-              },
+            child: IndexedStack(
+              index: index,
+              children: widget.images
+                  .map(
+                    (e) => ImageCropper(
+                      key: Key(e.path),
+                      file: e,
+                      points: points[e] ??
+                          [
+                            Offset(0, 0),
+                            Offset(1, 1),
+                          ],
+                      onPointsChanged: (p) {
+                        setState(() {
+                          points[e] = p;
+                        });
+                      },
+                    ),
+                  )
+                  .toList(),
             ),
           ),
           SingleChildScrollView(
@@ -50,12 +93,12 @@ class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      selectedFile = file;
+                      index = widget.images.indexOf(file);
                     });
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      border: file == selectedFile
+                      border: file == widget.images[index]
                           ? Border.all(color: Colors.white)
                           : null,
                     ),
@@ -76,4 +119,37 @@ class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
       ),
     );
   }
+}
+
+Future<String> getTemporaryPath(String fileName) async {
+  return "${(await getTemporaryDirectory()).path}/$fileName";
+}
+
+Future<File> _exportPDFFile(List<i.Image> images) async {
+  final pdf = pw.Document();
+  images.forEach(
+    (image) {
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          margin: pw.EdgeInsets.zero,
+          build: (pw.Context context) {
+            return pw.Center(
+              child: pw.Image.provider(
+                pw.RawImage(
+                  width: image.width,
+                  height: image.height,
+                  bytes: image.getBytes(),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+    },
+  );
+
+  final file = File(await getTemporaryPath("generated.pdf"));
+  Uint8List data = pdf.save();
+  return file.writeAsBytes(data);
 }

@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'dart:async';
+import 'dart:io';
 
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
 import 'package:scan_document/scan_document.dart';
 
 void main() {
@@ -36,8 +36,9 @@ class Home extends StatelessWidget {
       body: Center(
         child: FlatButton(
           child: Text("Scan Documen t"),
-          onPressed: () {
-            scanDocument(context);
+          onPressed: () async {
+            File pdf = await scanDocument(context);
+            OpenFile.open(pdf.path);
           },
         ),
       ),

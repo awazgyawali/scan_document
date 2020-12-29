@@ -2,7 +2,15 @@ PODS:
   - camera (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - image_gallery_saver (1.5.0):
+    - Flutter
   - media_gallery (0.0.1):
+    - Flutter
+  - open_file (0.0.1):
+    - Flutter
+  - path_provider (0.0.1):
+    - Flutter
+  - "permission_handler (5.0.1+1)":
     - Flutter
   - scan_document (0.0.1):
     - Flutter
@@ -10,7 +18,11 @@ PODS:
 DEPENDENCIES:
   - camera (from `.symlinks/plugins/camera/ios`)
   - Flutter (from `Flutter`)
+  - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
   - media_gallery (from `.symlinks/plugins/media_gallery/ios`)
+  - open_file (from `.symlinks/plugins/open_file/ios`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - scan_document (from `.symlinks/plugins/scan_document/ios`)
 
 EXTERNAL SOURCES:
@@ -18,15 +30,27 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/camera/ios"
   Flutter:
     :path: Flutter
+  image_gallery_saver:
+    :path: ".symlinks/plugins/image_gallery_saver/ios"
   media_gallery:
     :path: ".symlinks/plugins/media_gallery/ios"
+  open_file:
+    :path: ".symlinks/plugins/open_file/ios"
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
+  permission_handler:
+    :path: ".symlinks/plugins/permission_handler/ios"
   scan_document:
     :path: ".symlinks/plugins/scan_document/ios"
 
 SPEC CHECKSUMS:
   camera: a0ca5080336f7af47b88436e5e26da3dee5568f0
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
   media_gallery: 834a04455a476b975c280aa1f24ed2853dfe36de
+  open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
+  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
+  permission_handler: eac8e15b4a1a3fba55b761d19f3f4e6b005d15b6
   scan_document: 289f6d591aba799c49c2235bed1fe350f7a9e743
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c

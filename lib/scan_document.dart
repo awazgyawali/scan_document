@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:scan_document/image_cropper.dart';
 import 'package:scan_document/images_post_processing.dart';
 
 Future<File> scanDocument(BuildContext context) async {
@@ -26,7 +25,6 @@ class _ScanDocumentState extends State<_ScanDocument> {
   List<File> capturedImages = [];
   @override
   void initState() {
-    // TODO: implement initState
     initAsync();
     super.initState();
   }
@@ -42,6 +40,9 @@ class _ScanDocumentState extends State<_ScanDocument> {
   Widget build(BuildContext context) {
     if (_cameraController == null)
       return Scaffold(
+        appBar: AppBar(
+          title: Text("Scan Document"),
+        ),
         body: Center(child: CircularProgressIndicator()),
       );
     final size = MediaQuery.of(context).size;
@@ -53,6 +54,9 @@ class _ScanDocumentState extends State<_ScanDocument> {
       xScale = 1.0;
     }
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Scan Document"),
+      ),
       body: Stack(
         children: [
           AspectRatio(
@@ -67,87 +71,89 @@ class _ScanDocumentState extends State<_ScanDocument> {
           ),
           Align(
             alignment: Alignment(0, 1),
-            child: Container(
-              padding: EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  if (capturedImages.length > 0)
-                    Stack(
-                      children: [
-                        Container(
-                          height: 60,
-                          width: 60,
-                          child: Image.file(
-                            capturedImages.last,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        FractionalTranslation(
-                          translation: Offset(-.5, -.5),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).accentColor,
-                              shape: BoxShape.circle,
+            child: SafeArea(
+              child: Container(
+                padding: EdgeInsets.all(20),
+                child: Row(
+                  children: [
+                    if (capturedImages.length > 0)
+                      Stack(
+                        children: [
+                          Container(
+                            height: 60,
+                            width: 60,
+                            child: Image.file(
+                              capturedImages.last,
+                              fit: BoxFit.cover,
                             ),
-                            padding: EdgeInsets.all(6),
-                            child: Text(
-                              capturedImages.length.toString(),
-                              style: TextStyle(
-                                color: Colors.white,
+                          ),
+                          FractionalTranslation(
+                            translation: Offset(-.5, -.5),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).accentColor,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: EdgeInsets.all(6),
+                              child: Text(
+                                capturedImages.length.toString(),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
-                          ),
-                        )
-                      ],
-                    ),
-                  Spacer(),
-                  GestureDetector(
-                    onTap: () async {
-                      Directory directory =
-                          await getApplicationDocumentsDirectory();
-                      String filePath =
-                          "${directory.path}/${DateTime.now().microsecondsSinceEpoch}";
-                      await _cameraController.takePicture(filePath);
-                      setState(() {
-                        capturedImages.add(File(filePath));
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 3,
-                        ),
-                        shape: BoxShape.circle,
+                          )
+                        ],
                       ),
+                    Spacer(),
+                    GestureDetector(
+                      onTap: () async {
+                        Directory directory =
+                            await getApplicationDocumentsDirectory();
+                        String filePath =
+                            "${directory.path}/${DateTime.now().microsecondsSinceEpoch}";
+                        await _cameraController.takePicture(filePath);
+                        setState(() {
+                          capturedImages.add(File(filePath));
+                        });
+                      },
                       child: Container(
-                        margin: EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 3,
+                          ),
                           shape: BoxShape.circle,
                         ),
-                        height: 50,
-                        width: 50,
+                        child: Container(
+                          margin: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          height: 50,
+                          width: 50,
+                        ),
                       ),
                     ),
-                  ),
-                  Spacer(),
-                  if (capturedImages.length > 0)
-                    FlatButton(
-                      child: Text("Continue"),
-                      textColor: Colors.white,
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ImagesPostProcessing(
-                              images: capturedImages,
+                    Spacer(),
+                    if (capturedImages.length > 0)
+                      FlatButton(
+                        child: Text("Continue"),
+                        textColor: Colors.white,
+                        onPressed: () async {
+                          File pdf = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  ImagesPostProcessing(images: capturedImages),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                ],
+                          );
+                          if (pdf != null) Navigator.pop(context, pdf);
+                        },
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
