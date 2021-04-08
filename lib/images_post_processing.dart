@@ -135,7 +135,7 @@ Future<File> _exportPDFFile(List<i.Image> images) async {
           margin: pw.EdgeInsets.zero,
           build: (pw.Context context) {
             return pw.Center(
-              child: pw.Image.provider(
+              child: pw.Image(
                 pw.RawImage(
                   width: image.width,
                   height: image.height,
@@ -150,6 +150,6 @@ Future<File> _exportPDFFile(List<i.Image> images) async {
   );
 
   final file = File(await getTemporaryPath("generated.pdf"));
-  Uint8List data = pdf.save();
+  Uint8List data = await pdf.save();
   return file.writeAsBytes(data);
 }

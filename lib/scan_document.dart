@@ -108,13 +108,9 @@ class _ScanDocumentState extends State<_ScanDocument> {
                     Spacer(),
                     GestureDetector(
                       onTap: () async {
-                        Directory directory =
-                            await getApplicationDocumentsDirectory();
-                        String filePath =
-                            "${directory.path}/${DateTime.now().microsecondsSinceEpoch}";
-                        await _cameraController.takePicture(filePath);
+                        XFile file = await _cameraController.takePicture();
                         setState(() {
-                          capturedImages.add(File(filePath));
+                          capturedImages.add(File(file.path));
                         });
                       },
                       child: Container(
