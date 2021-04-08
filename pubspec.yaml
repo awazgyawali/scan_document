@@ -1,6 +1,6 @@
 name: scan_document
 description: A new flutter plugin project.
-version: 0.1.0
+version: 0.1.1
 homepage:
 
 environment:
@@ -10,11 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  pdf: ^3.1.0
-  camera: ^0.8.1
-  image: ^3.0.2
-  media_gallery: ^0.1.5
+  pdf: 
+  image: 
+  camera: 
   path_provider: 
+  media_gallery: ^0.1.5
 
 dev_dependencies:
   flutter_test:

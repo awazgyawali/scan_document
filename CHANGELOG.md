@@ -1,3 +1,6 @@
+## 0.1.1
+
+* Open ended package version
 ## 0.1.0
 
 * Open ended package version
