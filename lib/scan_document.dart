@@ -133,9 +133,11 @@ class _ScanDocumentState extends State<_ScanDocument> {
                     ),
                     Spacer(),
                     if (capturedImages.length > 0)
-                      FlatButton(
+                      TextButton(
                         child: Text("Continue"),
-                        textColor: Colors.white,
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.white)),
                         onPressed: () async {
                           File? pdf = await Navigator.push(
                             context,

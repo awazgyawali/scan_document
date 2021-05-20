@@ -1,4 +1,4 @@
-## 0.2.0
+## 0.2.0+1
 
 * Added null saftey support
 ## 0.1.2
