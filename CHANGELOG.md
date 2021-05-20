@@ -1,3 +1,6 @@
+## 0.2.0
+
+* Added null saftey support
 ## 0.1.2
 
 * Locked package
