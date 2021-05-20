@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 class ImageCropper extends StatefulWidget {
   final File file;
   final List<Offset> points;
-  final Function(List<Offset>) onPointsChanged;
+  final Function(List<Offset>)? onPointsChanged;
   const ImageCropper({
-    Key key,
-    @required this.file,
-    @required this.points,
+    Key? key,
+    required this.file,
+    required this.points,
     this.onPointsChanged,
   }) : super(key: key);
 
@@ -19,9 +19,9 @@ class ImageCropper extends StatefulWidget {
 }
 
 class _ImageCropperState extends State<ImageCropper> {
-  int _movingIndex;
-  i.Image image;
-  DragState dragState;
+  late int _movingIndex;
+  i.Image? image;
+  DragState? dragState;
   initState() {
     super.initState();
     transformedImage = i.decodeImage(widget.file.readAsBytesSync());
@@ -50,14 +50,14 @@ class _ImageCropperState extends State<ImageCropper> {
     dragState = DragState.OUTSIDE;
   }
 
-  i.Image transformedImage;
+  i.Image? transformedImage;
 
   double _distance(Offset a, Offset b) {
     return sqrt(pow(b.dy - a.dy, 2) + pow(b.dx - a.dx, 2));
   }
 
   double get height =>
-      (transformedImage.width / transformedImage.height) * width;
+      (transformedImage!.width / transformedImage!.height) * width;
   double get width => MediaQuery.of(context).size.width;
   List<Offset> get points => [
         Offset(widget.points[0].dx * width, widget.points[0].dy * height),
@@ -93,22 +93,22 @@ class _ImageCropperState extends State<ImageCropper> {
                       currentFinger.dx / width,
                       currentFinger.dy / height,
                     );
-                    widget.onPointsChanged(points);
+                    widget.onPointsChanged!(points);
                     break;
                   case 1:
                     points[0] = Offset(points[0].dx, currentFinger.dy / height);
                     points[1] = Offset(currentFinger.dx / width, points[1].dy);
-                    widget.onPointsChanged(points);
+                    widget.onPointsChanged!(points);
                     break;
                   case 2:
                     points[1] = Offset(
                         currentFinger.dx / width, currentFinger.dy / height);
-                    widget.onPointsChanged(points);
+                    widget.onPointsChanged!(points);
                     break;
                   case 3:
                     points[0] = Offset(currentFinger.dx / width, points[0].dy);
                     points[1] = Offset(points[1].dx, currentFinger.dy / height);
-                    widget.onPointsChanged(points);
+                    widget.onPointsChanged!(points);
                     break;
                   default:
                 }
@@ -128,7 +128,7 @@ class _ImageCropperState extends State<ImageCropper> {
                     (revisedPoint.dy / height).clamp(0.0, double.infinity),
                   );
                 }).toList();
-                widget.onPointsChanged(proposedPoints);
+                widget.onPointsChanged!(proposedPoints);
               }
             },
             onPanEnd: (_) {

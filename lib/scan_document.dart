@@ -4,7 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:scan_document/images_post_processing.dart';
 
-Future<File> scanDocument(BuildContext context) async {
+Future<File?> scanDocument(BuildContext context) async {
   return Navigator.push(
     context,
     MaterialPageRoute(
@@ -19,7 +19,7 @@ class _ScanDocument extends StatefulWidget {
 }
 
 class _ScanDocumentState extends State<_ScanDocument> {
-  CameraController _cameraController;
+  CameraController? _cameraController;
 
   List<File> capturedImages = [];
   @override
@@ -31,7 +31,7 @@ class _ScanDocumentState extends State<_ScanDocument> {
   initAsync() async {
     List<CameraDescription> cameras = await availableCameras();
     _cameraController = CameraController(cameras[0], ResolutionPreset.medium);
-    await _cameraController.initialize();
+    await _cameraController!.initialize();
     setState(() {});
   }
 
@@ -46,7 +46,7 @@ class _ScanDocumentState extends State<_ScanDocument> {
       );
     final size = MediaQuery.of(context).size;
     final deviceRatio = size.width / size.height;
-    double xScale = _cameraController.value.aspectRatio / deviceRatio;
+    double xScale = _cameraController!.value.aspectRatio / deviceRatio;
     final yScale = 1.0;
 
     if (MediaQuery.of(context).orientation == Orientation.landscape) {
@@ -64,7 +64,7 @@ class _ScanDocumentState extends State<_ScanDocument> {
               child: Transform(
                 alignment: Alignment.center,
                 transform: Matrix4.diagonal3Values(xScale, yScale, 1),
-                child: CameraPreview(_cameraController),
+                child: CameraPreview(_cameraController!),
               ),
             ),
           ),
@@ -107,7 +107,7 @@ class _ScanDocumentState extends State<_ScanDocument> {
                     Spacer(),
                     GestureDetector(
                       onTap: () async {
-                        XFile file = await _cameraController.takePicture();
+                        XFile file = await _cameraController!.takePicture();
                         setState(() {
                           capturedImages.add(File(file.path));
                         });
@@ -137,7 +137,7 @@ class _ScanDocumentState extends State<_ScanDocument> {
                         child: Text("Continue"),
                         textColor: Colors.white,
                         onPressed: () async {
-                          File pdf = await Navigator.push(
+                          File? pdf = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) =>

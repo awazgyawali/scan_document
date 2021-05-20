@@ -9,9 +9,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:scan_document/image_cropper.dart';
 
 class ImagesPostProcessing extends StatefulWidget {
-  final List<File> images;
+  final List<File>? images;
 
-  const ImagesPostProcessing({Key key, this.images}) : super(key: key);
+  const ImagesPostProcessing({Key? key, this.images}) : super(key: key);
   @override
   _ImagesPostProcessingState createState() => _ImagesPostProcessingState();
 }
@@ -31,9 +31,9 @@ class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
             icon: Icon(Icons.check),
             onPressed: () async {
               List<i.Image> images = [];
-              widget.images.forEach(
+              widget.images!.forEach(
                 (file) {
-                  i.Image image = i.decodeImage(file.readAsBytesSync());
+                  i.Image image = i.decodeImage(file.readAsBytesSync())!;
                   if (image.exif.hasOrientation &&
                       image.exif.orientation != 1) {
                     switch (image.exif.orientation) {
@@ -43,7 +43,7 @@ class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
                     }
                     image.exif.orientation = 1;
                   }
-                  List<Offset> dots = points[file];
+                  List<Offset> dots = points[file]!;
                   images.add(
                     i.copyCrop(
                       image,
@@ -66,7 +66,7 @@ class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
           Expanded(
             child: IndexedStack(
               index: index,
-              children: widget.images
+              children: widget.images!
                   .map(
                     (e) => ImageCropper(
                       key: Key(e.path),
@@ -89,16 +89,16 @@ class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: widget.images.map((file) {
+              children: widget.images!.map((file) {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      index = widget.images.indexOf(file);
+                      index = widget.images!.indexOf(file);
                     });
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      border: file == widget.images[index]
+                      border: file == widget.images![index]
                           ? Border.all(color: Colors.white)
                           : null,
                     ),

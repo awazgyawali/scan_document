@@ -24,7 +24,7 @@ class _MyAppState extends State<MyApp> {
 
 class Home extends StatelessWidget {
   const Home({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -34,11 +34,11 @@ class Home extends StatelessWidget {
         title: Text('Plugin example app'),
       ),
       body: Center(
-        child: FlatButton(
+        child: TextButton(
           child: Text("Scan Documen t"),
           onPressed: () async {
-            File pdf = await scanDocument(context);
-            OpenFile.open(pdf.path);
+            File? pdf = await scanDocument(context);
+            if (pdf != null) OpenFile.open(pdf.path);
           },
         ),
       ),
