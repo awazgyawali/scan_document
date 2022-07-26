@@ -1,3 +1,6 @@
+## 0.3.0
+* Upgraded to latest version
+  
 ## 0.2.0+1
 
 * Added null saftey support

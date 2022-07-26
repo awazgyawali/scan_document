@@ -90,7 +90,7 @@ class _ScanDocumentState extends State<_ScanDocument> {
                             translation: Offset(-.5, -.5),
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Theme.of(context).accentColor,
+                                color: Theme.of(context).colorScheme.secondary,
                                 shape: BoxShape.circle,
                               ),
                               padding: EdgeInsets.all(6),

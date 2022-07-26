@@ -1,20 +1,19 @@
 name: scan_document
 description: A new flutter plugin project.
-version: 0.2.0+1
+version: 0.3.0
 homepage: https://github.com/awazgyawali/scan_document
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.20.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  pdf: ^3.1.0
-  image: ^3.0.2
-  camera: ^0.8.1
-  path_provider: ^2.0.1
-  media_gallery: ^0.1.5
+  pdf: ^3.8.2
+  image: ^3.2.0
+  camera: ^0.10.0
+  path_provider: ^2.0.11
 
 dev_dependencies:
   flutter_test:
