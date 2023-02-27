@@ -1,6 +1,6 @@
 name: scan_document
 description: A package to scan documents using camera and convert it to a PDF.
-version: 0.4.0
+version: 0.4.1
 homepage: https://github.com/awazgyawali/scan_document
 
 environment:
@@ -10,8 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  pdf: ^3.9.0
-  image: ^4.0.15
+  pdf: ^3.8.4
+  image: ^3.2.0
   camera: ^0.10.3+1
   path_provider: ^2.0.13
 

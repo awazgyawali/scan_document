@@ -1,4 +1,4 @@
-## 0.4.0
+## 0.4.1
 * Upgraded to latest version
   
 ## 0.3.0
