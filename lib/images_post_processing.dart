@@ -34,23 +34,24 @@ class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
               widget.images!.forEach(
                 (file) {
                   i.Image image = i.decodeImage(file.readAsBytesSync())!;
-                  if (image.exif.hasOrientation &&
-                      image.exif.orientation != 1) {
-                    switch (image.exif.orientation) {
+                  if (image.exif.imageIfd.hasOrientation &&
+                      image.exif.imageIfd.orientation != 1) {
+                    switch (image.exif.imageIfd.orientation) {
                       case 6:
-                        image = i.copyRotate(image, 90);
+                        image = i.copyRotate(image, angle: 90);
                         break;
                     }
-                    image.exif.orientation = 1;
+                    image.exif.imageIfd.orientation = 1;
                   }
                   List<Offset> dots = points[file]!;
                   images.add(
                     i.copyCrop(
                       image,
-                      (dots[0].dx * image.width).round(),
-                      (dots[0].dy * image.height).round(),
-                      ((dots[1].dx - dots[0].dx) * image.width).round(),
-                      ((dots[1].dy - dots[0].dy) * image.height).round(),
+                      x: (dots[0].dx * image.width).round(),
+                      y: (dots[0].dy * image.height).round(),
+                      width: ((dots[1].dx - dots[0].dx) * image.width).round(),
+                      height:
+                          ((dots[1].dy - dots[0].dy) * image.height).round(),
                     ),
                   );
                 },

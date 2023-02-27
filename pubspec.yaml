@@ -10,10 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  pdf: ^3.8.2
-  image: ^3.2.0
-  camera: ^0.10.0
-  path_provider: ^2.0.11
+  pdf: ^3.9.0
+  image: ^4.0.15
+  camera: ^0.10.3+1
+  path_provider: ^2.0.13
 
 dev_dependencies:
   flutter_test:
