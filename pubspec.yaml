@@ -1,6 +1,6 @@
 name: scan_document
 description: A package to scan documents using camera and convert it to a PDF.
-version: 0.4.1
+version: 0.5.0
 homepage: https://github.com/awazgyawali/scan_document
 
 environment:
