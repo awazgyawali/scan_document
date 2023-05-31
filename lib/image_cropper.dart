@@ -1,10 +1,17 @@
-import 'dart:io';
 import 'dart:math';
-import 'package:image/image.dart' as i;
+
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:image/image.dart' as i;
+
+enum DragState {
+  CORNER,
+  INSIDE,
+  OUTSIDE,
+}
 
 class ImageCropper extends StatefulWidget {
-  final File file;
+  final XFile file;
   final List<Offset> points;
   final Function(List<Offset>)? onPointsChanged;
   const ImageCropper({
@@ -18,47 +25,43 @@ class ImageCropper extends StatefulWidget {
   _ImageCropperState createState() => _ImageCropperState();
 }
 
+class PathPainter extends CustomPainter {
+  final List<Offset> points;
+  Paint dotPainter = Paint()..color = Colors.white;
+  Paint linePainter = Paint()
+    ..color = Colors.white
+    ..strokeWidth = 2
+    ..style = PaintingStyle.stroke;
+  PathPainter(this.points);
+  @override
+  void paint(Canvas canvas, Size size) {
+    Path path = Path();
+    Offset point1 = points[0];
+    Offset point2 = points[1];
+    path.moveTo(point1.dx * size.width, point1.dy * size.height);
+    path.lineTo(point2.dx * size.width, point1.dy * size.height);
+    path.lineTo(point2.dx * size.width, point2.dy * size.height);
+    path.lineTo(point1.dx * size.width, point2.dy * size.height);
+    path.lineTo(point1.dx * size.width, point1.dy * size.height);
+
+    // canvas.drawCircle(point, 5, dotPainter);
+    // path.lineTo(points.first.dx, points.first.dy);
+
+    canvas.drawPath(path, linePainter);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
 class _ImageCropperState extends State<ImageCropper> {
   late int _movingIndex;
-  i.Image? image;
   DragState? dragState;
-  initState() {
-    super.initState();
-    transformedImage = i.decodeImage(widget.file.readAsBytesSync());
-  }
-
-  _isNear(Offset touchPoint) {
-    _movingIndex = -1;
-    // Check corner
-    for (Offset point in points) {
-      double distance = _distance(point, touchPoint);
-      if (distance <= 20) {
-        dragState = DragState.CORNER;
-        _movingIndex = points.indexOf(point);
-        return;
-      }
-    }
-
-    // Check inside
-    if (touchPoint.dx > points[0].dx &&
-        touchPoint.dx < points[1].dx &&
-        touchPoint.dy > points[0].dy &&
-        touchPoint.dy < points[2].dy) {
-      dragState = DragState.INSIDE;
-      return;
-    }
-    dragState = DragState.OUTSIDE;
-  }
-
   i.Image? transformedImage;
-
-  double _distance(Offset a, Offset b) {
-    return sqrt(pow(b.dy - a.dy, 2) + pow(b.dx - a.dx, 2));
-  }
 
   double get height =>
       (transformedImage!.width / transformedImage!.height) * width;
-  double get width => MediaQuery.of(context).size.width;
+
   List<Offset> get points => [
         Offset(widget.points[0].dx * width, widget.points[0].dy * height),
         Offset(widget.points[1].dx * width, widget.points[0].dy * height),
@@ -66,9 +69,12 @@ class _ImageCropperState extends State<ImageCropper> {
         Offset(widget.points[0].dx * width, widget.points[1].dy * height),
       ];
 
+  double get width => MediaQuery.of(context).size.width;
+
   @override
   Widget build(BuildContext context) {
-    print(height);
+    if (transformedImage == null)
+      return Center(child: CircularProgressIndicator());
     return SafeArea(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -136,8 +142,8 @@ class _ImageCropperState extends State<ImageCropper> {
             },
             child: CustomPaint(
               foregroundPainter: PathPainter(widget.points),
-              child: Image.file(
-                widget.file,
+              child: Image.memory(
+                transformedImage!.getBytes(),
                 width: MediaQuery.of(context).size.width,
                 fit: BoxFit.contain,
               ),
@@ -147,39 +153,40 @@ class _ImageCropperState extends State<ImageCropper> {
       ),
     );
   }
-}
 
-class PathPainter extends CustomPainter {
-  PathPainter(this.points);
-  final List<Offset> points;
-  Paint dotPainter = Paint()..color = Colors.white;
-  Paint linePainter = Paint()
-    ..color = Colors.white
-    ..strokeWidth = 2
-    ..style = PaintingStyle.stroke;
-  @override
-  void paint(Canvas canvas, Size size) {
-    Path path = Path();
-    Offset point1 = points[0];
-    Offset point2 = points[1];
-    path.moveTo(point1.dx * size.width, point1.dy * size.height);
-    path.lineTo(point2.dx * size.width, point1.dy * size.height);
-    path.lineTo(point2.dx * size.width, point2.dy * size.height);
-    path.lineTo(point1.dx * size.width, point2.dy * size.height);
-    path.lineTo(point1.dx * size.width, point1.dy * size.height);
-
-    // canvas.drawCircle(point, 5, dotPainter);
-    // path.lineTo(points.first.dx, points.first.dy);
-
-    canvas.drawPath(path, linePainter);
+  initState() {
+    super.initState();
+    widget.file.readAsBytes().then((value) {
+      setState(() {
+        transformedImage = i.decodeImage(value);
+      });
+    });
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
+  double _distance(Offset a, Offset b) {
+    return sqrt(pow(b.dy - a.dy, 2) + pow(b.dx - a.dx, 2));
+  }
 
-enum DragState {
-  CORNER,
-  INSIDE,
-  OUTSIDE,
+  _isNear(Offset touchPoint) {
+    _movingIndex = -1;
+    // Check corner
+    for (Offset point in points) {
+      double distance = _distance(point, touchPoint);
+      if (distance <= 20) {
+        dragState = DragState.CORNER;
+        _movingIndex = points.indexOf(point);
+        return;
+      }
+    }
+
+    // Check inside
+    if (touchPoint.dx > points[0].dx &&
+        touchPoint.dx < points[1].dx &&
+        touchPoint.dy > points[0].dy &&
+        touchPoint.dy < points[2].dy) {
+      dragState = DragState.INSIDE;
+      return;
+    }
+    dragState = DragState.OUTSIDE;
+  }
 }

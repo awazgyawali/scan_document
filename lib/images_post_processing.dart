@@ -1,15 +1,14 @@
-import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:camera/camera.dart';
 import 'package:image/image.dart' as i;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:scan_document/image_cropper.dart';
 
 class ImagesPostProcessing extends StatefulWidget {
-  final List<File>? images;
+  final List<XFile>? images;
 
   const ImagesPostProcessing({Key? key, this.images}) : super(key: key);
   @override
@@ -18,7 +17,7 @@ class ImagesPostProcessing extends StatefulWidget {
 
 class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
   int index = 0;
-  Map<File, List<Offset>> points = {};
+  Map<XFile, List<Offset>> points = {};
 
   @override
   Widget build(BuildContext context) {
@@ -31,31 +30,29 @@ class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
             icon: Icon(Icons.check),
             onPressed: () async {
               List<i.Image> images = [];
-              widget.images!.forEach(
-                (file) {
-                  i.Image image = i.decodeImage(file.readAsBytesSync())!;
-                  if (image.exif.imageIfd.hasOrientation &&
-                      image.exif.imageIfd.Orientation != 1) {
-                    switch (image.exif.imageIfd.Orientation) {
-                      case 6:
-                        image = i.copyRotate(image, 90);
-                        break;
-                    }
-                    image.exif.imageIfd.Orientation = 1;
+              for (XFile file in widget.images!) {
+                i.Image image = i.decodeImage(await file.readAsBytes())!;
+                if (image.exif.imageIfd.hasOrientation &&
+                    image.exif.imageIfd.Orientation != 1) {
+                  switch (image.exif.imageIfd.Orientation) {
+                    case 6:
+                      image = i.copyRotate(image, 90);
+                      break;
                   }
-                  List<Offset> dots = points[file]!;
-                  images.add(
-                    i.copyCrop(
-                      image,
-                      (dots[0].dx * image.width).round(),
-                      (dots[0].dy * image.height).round(),
-                      ((dots[1].dx - dots[0].dx) * image.width).round(),
-                      ((dots[1].dy - dots[0].dy) * image.height).round(),
-                    ),
-                  );
-                },
-              );
-              File pdf = await _exportPDFFile(images);
+                  image.exif.imageIfd.Orientation = 1;
+                }
+                List<Offset> dots = points[file]!;
+                images.add(
+                  i.copyCrop(
+                    image,
+                    (dots[0].dx * image.width).round(),
+                    (dots[0].dy * image.height).round(),
+                    ((dots[1].dx - dots[0].dx) * image.width).round(),
+                    ((dots[1].dy - dots[0].dy) * image.height).round(),
+                  ),
+                );
+              }
+              XFile pdf = await _exportPDFFile(images);
               Navigator.pop(context, pdf);
             },
           )
@@ -104,11 +101,16 @@ class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
                     ),
                     padding: EdgeInsets.all(3),
                     margin: EdgeInsets.all(10),
-                    child: Image.file(
-                      file,
-                      height: 60,
-                      width: 60,
-                      fit: BoxFit.cover,
+                    child: FutureBuilder<Uint8List>(
+                      future: file.readAsBytes(),
+                      builder: (context, snapshot) => snapshot.hasData
+                          ? Image.memory(
+                              snapshot.data!,
+                              height: 60,
+                              width: 60,
+                              fit: BoxFit.cover,
+                            )
+                          : Container(),
                     ),
                   ),
                 );
@@ -121,11 +123,7 @@ class _ImagesPostProcessingState extends State<ImagesPostProcessing> {
   }
 }
 
-Future<String> getTemporaryPath(String fileName) async {
-  return "${(await getTemporaryDirectory()).path}/$fileName";
-}
-
-Future<File> _exportPDFFile(List<i.Image> images) async {
+Future<XFile> _exportPDFFile(List<i.Image> images) async {
   final pdf = pw.Document();
   images.forEach(
     (image) {
@@ -149,7 +147,8 @@ Future<File> _exportPDFFile(List<i.Image> images) async {
     },
   );
 
-  final file = File(await getTemporaryPath("generated.pdf"));
-  Uint8List data = await pdf.save();
-  return file.writeAsBytes(data);
+  return XFile.fromData(
+    await pdf.save(),
+    name: "generated.pdf",
+  );
 }

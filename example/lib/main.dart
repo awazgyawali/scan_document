@@ -1,5 +1,4 @@
-import 'dart:io';
-
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 import 'package:scan_document/scan_document.dart';
@@ -38,7 +37,7 @@ class Home extends StatelessWidget {
         child: TextButton(
           child: Text("Scan Documen t"),
           onPressed: () async {
-            File? pdf = await scanDocument(context);
+            XFile? pdf = await scanDocument(context);
             if (pdf != null) OpenFile.open(pdf.path);
           },
         ),

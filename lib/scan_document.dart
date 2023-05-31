@@ -1,10 +1,10 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:scan_document/images_post_processing.dart';
 
-Future<File?> scanDocument(BuildContext context) async {
+Future<XFile?> scanDocument(BuildContext context) async {
   return Navigator.push(
     context,
     MaterialPageRoute(
@@ -21,7 +21,7 @@ class _ScanDocument extends StatefulWidget {
 class _ScanDocumentState extends State<_ScanDocument> {
   CameraController? _cameraController;
 
-  List<File> capturedImages = [];
+  List<XFile> capturedImages = [];
   @override
   void initState() {
     initAsync();
@@ -81,9 +81,14 @@ class _ScanDocumentState extends State<_ScanDocument> {
                           Container(
                             height: 60,
                             width: 60,
-                            child: Image.file(
-                              capturedImages.last,
-                              fit: BoxFit.cover,
+                            child: FutureBuilder<Uint8List>(
+                              future: capturedImages.last.readAsBytes(),
+                              builder: (context, snapshot) => snapshot.hasData
+                                  ? Image.memory(
+                                      snapshot.data!,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(),
                             ),
                           ),
                           FractionalTranslation(
@@ -109,7 +114,7 @@ class _ScanDocumentState extends State<_ScanDocument> {
                       onTap: () async {
                         XFile file = await _cameraController!.takePicture();
                         setState(() {
-                          capturedImages.add(File(file.path));
+                          capturedImages.add(file);
                         });
                       },
                       child: Container(
@@ -139,7 +144,7 @@ class _ScanDocumentState extends State<_ScanDocument> {
                             backgroundColor:
                                 MaterialStateProperty.all(Colors.white)),
                         onPressed: () async {
-                          File? pdf = await Navigator.push(
+                          XFile? pdf = await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
